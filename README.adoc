@@ -1,76 +1,204 @@
-= llm-verify
-Jonathan D.A. Jewell <jonathan.jewell@gmail.com>
-:toc: macro
-:icons: font
-:source-highlighter: rouge
-:experimental:
-:url-github: https://github.com/hyperpolymath/llm-verify
-:url-gitlab: https://gitlab.com/hyperpolymath/llm-verify
-:url-bitbucket: https://bitbucket.org/hyperpolymath/llm-verify
-:url-codeberg: https://codeberg.org/hyperpolymath/llm-verify
+= LLM-verify
 
-LLM output verification and validation
+Real verification for LLM-generated code via ECHIDNA integration.
 
-image:https://img.shields.io/badge/RSR-Certified-gold[RSR Certified]
-image:https://img.shields.io/badge/License-AGPL%20v3-blue[License]
+== The Problem
 
-toc::[]
+When Claude "validates" code, it's doing pattern matching against training data:
 
-== Overview
+| What It Looks Like | What's Actually Happening |
+|-------------------|---------------------------|
+| "This code is correct" | High confidence from patterns |
+| "I notice this bug" | Pattern recognition |
+| "The types match" | Internalised grammar patterns |
+| "This compiles" | Syntax familiarity prediction |
 
-llm-verify is part of the link:https://rhodium.sh[Rhodium Standard] (RSR) ecosystem.
+*Claude is not running:*
+- Pratt parsers
+- SMT solvers
+- Model checkers
+- Theorem provers
+- Type inference algorithms
 
-Domain: *software-development*
+Claude makes educated guesses. It's often right, but can and does make mistakes.
 
-== Installation
+== The Solution
 
-[source,bash]
-----
-# Clone from GitHub (primary)
-git clone {url-github}
+`claude-verify` provides *actual* verification by integrating with [ECHIDNA](https://github.com/Hyperpolymath/echidna), a neurosymbolic theorem proving platform that provides access to 12 provers:
 
-# Or from mirrors
-git clone {url-gitlab}
-git clone {url-codeberg}
-----
+- *SMT Solvers*: Z3, CVC5
+- *Theorem Provers*: Lean 4, Coq, Agda, Isabelle, HOL Light, Mizar
+- *First-Order ATP*: Vampire, E
+- *Model Checkers*: TLC (TLA+), Alloy Analyzer
 
-== RSR Stack
+Plus neurosymbolic integration via DeepProbLog and OpenCyc.
 
-This project follows RSR conventions:
+== Quick Start
 
-* ✅ ReScript for frontend/logic
-* ✅ Deno for JS runtime
-* ✅ WASM for performance-critical code
-* ✅ Rust/OCaml/Haskell for systems/proofs
-* ✅ Guile/Scheme for configuration
-* ❌ No TypeScript
-* ❌ No Go
-* ❌ No npm
+```bash
+= Install (requires GHC 9.4+)
+cabal install claude-verify
 
-== Mirrors
+= Initialize project configuration
+claude-verify init
 
-[cols="1,2"]
-|===
-| Platform | URL
+= Verify files
+claude-verify verify src/*.rs
 
-| GitHub (primary) | {url-github}
-| GitLab | {url-gitlab}
-| Bitbucket | {url-bitbucket}
-| Codeberg | {url-codeberg}
-|===
+= Record feedback when Claude is wrong
+claude-verify feedback record \
+    --output "for i in 0..=n" \
+    --issue "Off-by-one: should be 0..n" \
+    --correction "for i in 0..n"
+
+= View known issues
+claude-verify feedback list
+```
+
+== Configuration
+
+Create `.claude-context.toml` in your project root:
+
+```toml
+[project]
+name = "my-project"
+languages = ["rust"]
+safety_level = "high"
+
+[known_issues]
+items = [
+    "Off-by-one in pagination - use exclusive upper bounds",
+    "This project uses no_std - don't assume alloc",
+]
+
+[verification]
+required = ["compile", "clippy", "test"]
+optional = ["miri", "audit"]
+
+[formal_specs]
+tla_plus = ["specs/consensus.tla"]
+lean = ["specs/invariants.lean"]
+```
+
+== Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│   Claude Output (probabilistic)                                  │
+│         │                                                        │
+│         ▼                                                        │
+│   ┌─────────────────┐                                            │
+│   │  claude-verify  │  Haskell orchestrator                      │
+│   │                 │  - Multi-language parsing                  │
+│   │                 │  - VC extraction                           │
+│   │                 │  - Feedback capture                        │
+│   └─────────────────┘                                            │
+│         │                                                        │
+│         ▼                                                        │
+│   ┌─────────────────┐                                            │
+│   │    ECHIDNA      │  Neurosymbolic platform                    │
+│   │                 │  - 12 theorem provers                      │
+│   │                 │  - DeepProbLog                             │
+│   │                 │  - OpenCyc                                 │
+│   └─────────────────┘                                            │
+│         │                                                        │
+│         ▼                                                        │
+│   ACTUAL VERIFICATION                                            │
+│         │                                                        │
+│         ▼                                                        │
+│   ┌─────────────────┐                                            │
+│   │    Feedback     │  For future sessions                       │
+│   │     Loop        │                                            │
+│   └─────────────────┘                                            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+== Commands
+
+```
+claude-verify verify [FILES]     Verify with ECHIDNA provers
+claude-verify check [FILES]      Quick checks (no formal verification)
+claude-verify feedback record    Record a correction
+claude-verify feedback list      Show recent feedback
+claude-verify feedback export    Export for session injection
+claude-verify init               Create .claude-context.toml
+claude-verify stats              Show verification statistics
+```
+
+== Pre-commit Hook
+
+```bash
+#!/bin/bash
+= .git/hooks/pre-commit
+claude-verify check --staged --fail-on-error
+```
+
+== CI/CD Integration
+
+```yaml
+= .github/workflows/verify.yml
+- uses: hyperpolymath/claude-verify-action@v1
+  with:
+    echidna-version: 'latest'
+    fail-on: ['counterexample', 'error']
+```
+
+== Feedback Loop
+
+The key innovation is the *feedback loop*: when verification fails or a user corrects Claude, the issue is captured with full provenance and injected into future sessions.
+
+```
+User corrects Claude → Feedback captured → Stored in DB
+                                              ↓
+Next Claude session ← Known issues injected ←┘
+```
+
+See [docs/feedback-loop-spec.md](docs/feedback-loop-spec.md) for details.
+
+== Building from Source
+
+Requires:
+- GHC 9.4+
+- cabal-install 3.8+
+- Z3 (optional, for local SMT solving)
+
+```bash
+git clone https://github.com/Hyperpolymath/llm-verify
+cd llm-verify
+cabal build
+cabal test
+cabal install
+```
+
+Or with just:
+```bash
+just build
+just test
+just install
+```
+
+== Related Projects
+
+- [ECHIDNA](https://github.com/Hyperpolymath/echidna) - The neurosymbolic theorem proving platform
+- [Echomesh](https://github.com/Hyperpolymath/echomesh) - Cross-session context persistence
 
 == License
 
-Licensed under AGPL-3.0-or-later OR LicenseRef-Palimpsest-0.5.
+MIT
 
-See link:LICENSE[LICENSE] for details.
+== What This Doesn't Do
 
-== Contributing
+- Make Claude actually understand code (still pattern matching)
+- Guarantee absence of all bugs (verification is incomplete)
+- Replace human review (humans understand requirements)
+- Verify arbitrary properties (needs specifications)
 
-See link:CONTRIBUTING.adoc[CONTRIBUTING.adoc].
+== What This Does
 
-== Metadata
-
-* Domain: software-development
-* Framework: RSR (Rhodium Standard Repository)
-* Dublin Core: link:.well-known/dc.xml[.well-known/dc.xml]
+- Provide actual verification instead of guessing
+- Capture and persist correction feedback
+- Integrate real provers (Z3, CVC5, Lean, etc.)
+- Give confidence levels with evidence
+- Enable learning from mistakes
