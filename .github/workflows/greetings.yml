@@ -1,6 +1,9 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 name: Greetings
 
 on: [pull_request_target, issues]
+
+permissions: read-all
 
 jobs:
   greeting:

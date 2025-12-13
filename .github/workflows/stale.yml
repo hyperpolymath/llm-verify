@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # This workflow warns and then closes issues and PRs that have had no activity for a specified amount of time.
 #
 # You can adjust the behavior by modifying this file.
@@ -9,6 +10,8 @@ on:
   schedule:
   - cron: '40 22 * * *'
 
+permissions: read-all
+
 jobs:
   stale:
 
@@ -18,7 +21,7 @@ jobs:
       pull-requests: write
 
     steps:
-    - uses: actions/stale@v5
+    - uses: actions/stale@28ca1036281a5e5922ead5184a1bbf96e5fc984e
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         stale-issue-message: 'Stale issue message'

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # This workflow installs the latest version of Terraform CLI and configures the Terraform CLI configuration file
 # with an API token for Terraform Cloud (app.terraform.io). On pull request events, this workflow will run
 # `terraform init`, `terraform fmt`, and `terraform plan` (speculative plan via Terraform Cloud). On push events
@@ -38,7 +39,7 @@
 # 3. Reference the GitHub secret in step using the `hashicorp/setup-terraform` GitHub Action.
 #   Example:
 #     - name: Setup Terraform
-#       uses: hashicorp/setup-terraform@v1
+#       uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269f81c8
 #       with:
 #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
@@ -66,11 +67,11 @@ jobs:
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269f81c8
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 

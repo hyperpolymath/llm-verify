@@ -1,8 +1,11 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 name: Summarize new issues
 
 on:
   issues:
     types: [opened]
+
+permissions: read-all
 
 jobs:
   summary:
@@ -14,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Run AI inference
         id: inference
