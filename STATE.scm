@@ -261,7 +261,11 @@
       ((date . "2025-12-08")
        (event . "Initial STATE.scm created")
        (completion . 35)
-       (notes . "Project has solid foundation, needs verification pipeline completion")))))
+       (notes . "Project has solid foundation, needs verification pipeline completion"))
+      ((date . "2025-12-13")
+       (event . "OpenSSF Scorecard workflow fixes")
+       (files-fixed . 33)
+       (fixes . ("permissions: read-all" "SHA-pinned actions" "SPDX headers"))))))
 
 ;;;; ============================================================
 ;;;; FILES MODIFIED THIS SESSION
