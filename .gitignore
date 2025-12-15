@@ -1,44 +1,79 @@
-# Haskell / Cabal
-dist-newstyle/
-dist/
-*.hi
-*.o
-*.chi
-*.chs.h
-.cabal-sandbox/
-cabal.sandbox.config
-*.prof
-*.aux
-*.hp
-*.eventlog
-.stack-work/
-cabal.project.local
-cabal.project.local~
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# RSR-compliant .gitignore
 
-# IDE
-.idea/
-*.iml
-.vscode/
+# OS & Editor
+.DS_Store
+Thumbs.db
 *.swp
 *.swo
 *~
-.DS_Store
-tags
-TAGS
+.idea/
+.vscode/
 
-# Build outputs
-result
-result-*
+# Build
+/target/
+/_build/
+/build/
+/dist/
+/out/
 
-# Test artifacts
-*.tix
-.hpc/
+# Dependencies
+/node_modules/
+/vendor/
+/deps/
+/.elixir_ls/
 
-# claude-verify specific
-*.db
-*.db-journal
-claude_validation_report_*.md
-.claude-verify/
+# Rust
+# Cargo.lock  # Keep for binaries
 
-# Generated docs
-docs/haddock/
+# Elixir
+/cover/
+/doc/
+*.ez
+erl_crash.dump
+
+# Julia
+*.jl.cov
+*.jl.mem
+/Manifest.toml
+
+# ReScript
+/lib/bs/
+/.bsb.lock
+
+# Python (SaltStack only)
+__pycache__/
+*.py[cod]
+.venv/
+
+# Ada/SPARK
+*.ali
+/obj/
+/bin/
+
+# Haskell
+/.stack-work/
+/dist-newstyle/
+
+# Chapel
+*.chpl.tmp.*
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+secrets/
+
+# Test/Coverage
+/coverage/
+htmlcov/
+
+# Logs
+*.log
+/logs/
+
+# Temp
+/tmp/
+*.tmp
+*.bak
