@@ -16,8 +16,8 @@ description:
     * Feedback loop for learning from verification failures
     * Integration with git hooks, CI/CD, and Claude Code
 
-license:             MIT
-license-file:        LICENSE
+license:             MIT OR AGPL-3.0-or-later
+license-file:        LICENSE.txt
 author:              Hyperpolymath
 maintainer:
 copyright:           2025

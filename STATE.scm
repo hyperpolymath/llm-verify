@@ -15,7 +15,7 @@
   '((version . "0.1.0")
     (schema-version . "1.0")
     (created . "2025-12-15")
-    (updated . "2025-12-15")
+    (updated . "2025-12-17")
     (project . "llm-verify")
     (repo . "github.com/hyperpolymath/llm-verify")))
 
@@ -41,18 +41,28 @@
 
 (define current-position
   '((phase . "v0.1 - Initial Setup and RSR Compliance")
-    (overall-completion . 25)
+    (overall-completion . 30)
 
     (components
      ((rsr-compliance
        ((status . "complete")
         (completion . 100)
-        (notes . "SHA-pinned actions, SPDX headers, multi-platform CI")))
+        (notes . "SHA-pinned actions, SPDX headers, multi-platform CI, flake.nix, Containerfile")))
+
+      (package-management
+       ((status . "complete")
+        (completion . 100)
+        (notes . "guix.scm (primary) + flake.nix (fallback) - dual license MIT OR AGPL-3.0-or-later")))
+
+      (containerization
+       ((status . "complete")
+        (completion . 100)
+        (notes . "Containerfile added with multi-stage build and security best practices")))
 
       (documentation
        ((status . "foundation")
-        (completion . 30)
-        (notes . "README exists, META/ECOSYSTEM/STATE.scm added")))
+        (completion . 35)
+        (notes . "README, ARCHITECTURE.md, META/ECOSYSTEM/STATE.scm, RSR_COMPLIANCE.adoc")))
 
       (testing
        ((status . "minimal")
@@ -62,13 +72,16 @@
       (core-functionality
        ((status . "in-progress")
         (completion . 25)
-        (notes . "Initial implementation underway")))))
+        (notes . "Initial implementation underway - Haskell project structure ready")))))
 
     (working-features
      ("RSR-compliant CI/CD pipeline"
       "Multi-platform mirroring (GitHub, GitLab, Bitbucket)"
       "SPDX license headers on all files"
-      "SHA-pinned GitHub Actions"))))
+      "SHA-pinned GitHub Actions"
+      "Guix package definition (guix.scm)"
+      "Nix flake (flake.nix)"
+      "OCI container support (Containerfile)"))))
 
 ;;;============================================================================
 ;;; ROUTE TO MVP
@@ -79,30 +92,68 @@
     (definition . "Stable release with comprehensive documentation and tests")
 
     (milestones
-     ((v0.2
+     ((v0.1
+       ((name . "Initial Setup and RSR Compliance")
+        (status . "in-progress")
+        (items
+         ("Architecture document" . done)
+         ("Haskell project structure" . done)
+         ("guix.scm package definition" . done)
+         ("flake.nix package definition" . done)
+         ("Containerfile" . done)
+         ("RSR compliance audit" . done)
+         ("Security review" . done))))
+
+      (v0.2
        ((name . "Core Functionality")
         (status . "pending")
         (items
-         ("Implement primary features"
-          "Add comprehensive tests"
-          "Improve documentation"))))
+         ("ECHIDNA client module - gRPC/JSON-RPC integration"
+          "Basic VC extraction from Rust/Haskell/Ada"
+          "Feedback capture to SQLite"
+          "CLI interface (verify, init, check-echidna)"
+          "SARIF/JSON report generation"
+          "Unit tests for core modules"))))
 
-      (v0.5
-       ((name . "Feature Complete")
+      (v0.3
+       ((name . "Language Support")
         (status . "pending")
         (items
-         ("All planned features implemented"
+         ("Rust parser and VC generator (Megaparsec)"
+          "Haskell parser and VC generator"
+          "Ada/SPARK parser"
+          "SMT-LIB output format support"))))
+
+      (v0.5
+       ((name . "Integration Phase")
+        (status . "pending")
+        (items
+         ("Pre-commit git hook"
+          "GitHub Action (hyperpolymath/claude-verify-action)"
+          "Browser extension for Claude.ai"
+          "Claude Code plugin (/verify command)"
           "Test coverage > 70%"
           "API stability"))))
+
+      (v0.8
+       ((name . "Advanced Features")
+        (status . "pending")
+        (items
+         ("Echomesh context integration"
+          "Multi-prover portfolio strategy"
+          "Neurosymbolic confidence calibration"
+          "Proof certificate generation"))))
 
       (v1.0
        ((name . "Production Release")
         (status . "pending")
         (items
-         ("Comprehensive test coverage"
+         ("Comprehensive test coverage > 80%"
           "Performance optimization"
-          "Security audit"
-          "User documentation complete"))))))))
+          "Security audit (external)"
+          "User documentation complete"
+          "Anthropic feedback API integration (optional)"
+          "Community issue database"))))))))
 
 ;;;============================================================================
 ;;; BLOCKERS & ISSUES
@@ -133,17 +184,19 @@
 
 (define critical-next-actions
   '((immediate
-     (("Review and update documentation" . medium)
-      ("Add initial test coverage" . high)
-      ("Verify CI/CD pipeline functionality" . high)))
+     (("Implement ECHIDNA client module" . high)
+      ("Create basic VC extraction" . high)
+      ("Add unit tests for existing modules" . medium)))
 
     (this-week
-     (("Implement core features" . high)
-      ("Expand test coverage" . medium)))
+     (("Complete Rust language parser" . high)
+      ("Implement feedback capture system" . high)
+      ("Add CLI verify command" . medium)))
 
     (this-month
      (("Reach v0.2 milestone" . high)
-      ("Complete documentation" . medium)))))
+      ("Complete Haskell/Ada parsers" . medium)
+      ("Implement SARIF report generation" . medium)))))
 
 ;;;============================================================================
 ;;; SESSION HISTORY
@@ -151,6 +204,17 @@
 
 (define session-history
   '((snapshots
+     ((date . "2025-12-17")
+      (session . "security-and-compliance-review")
+      (accomplishments
+       ("Added flake.nix for Nix package management"
+        "Added Containerfile for OCI container builds"
+        "Fixed license consistency (MIT OR AGPL-3.0-or-later)"
+        "Updated guix.scm with proper dual license"
+        "Updated RSR_COMPLIANCE.adoc to Compliant status"
+        "Security audit: no HTTP URLs, no weak hashes, no hardcoded secrets"
+        "Updated roadmap with detailed milestones v0.1-v1.0"))
+      (notes . "Comprehensive SCM and security review completed"))
      ((date . "2025-12-15")
       (session . "initial-state-creation")
       (accomplishments
@@ -185,10 +249,13 @@
 (define state-summary
   '((project . "llm-verify")
     (version . "0.1.0")
-    (overall-completion . 25)
+    (overall-completion . 30)
+    (current-milestone . "v0.1 - Initial Setup and RSR Compliance (near complete)")
     (next-milestone . "v0.2 - Core Functionality")
     (critical-blockers . 0)
     (high-priority-issues . 0)
-    (updated . "2025-12-15")))
+    (rsr-compliance . "Compliant")
+    (security-status . "Audited - No issues found")
+    (updated . "2025-12-17")))
 
 ;;; End of STATE.scm
