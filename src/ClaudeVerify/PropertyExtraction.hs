@@ -337,7 +337,10 @@ negateExpr e@(ExprLit ann _) = ExprUnOp ann Not e
 negateExpr e@(ExprVar ann _) = ExprUnOp ann Not e
 negateExpr e = ExprUnOp (Annotation Nothing Nothing []) Not e
 
--- | Get array length (placeholder)
+-- | Get array length expression
+--
+-- Generates a method call to .len() for the given array expression.
+-- Language-specific backends may transform this to the appropriate syntax.
 arrayLen :: Expression -> Expression
 arrayLen arr = ExprMethodCall (Annotation Nothing Nothing []) arr (Ident "len") []
 

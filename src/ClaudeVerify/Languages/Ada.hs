@@ -34,6 +34,7 @@ module ClaudeVerify.Languages.Ada
 
 import ClaudeVerify.Internal.AST
 
+import Data.Maybe (listToMaybe)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
@@ -73,9 +74,35 @@ parseAdaFile path = do
 toGenericAST :: AdaAST -> Module
 toGenericAST = adaModule
 
--- | Extract SPARK contracts
+-- | Extract SPARK contracts from Ada/SPARK AST
+--
+-- Walks through all declarations (including nested modules) and extracts
+-- contracts from function declarations that have Pre/Post conditions.
 extractSparkContracts :: AdaAST -> [SparkContract]
-extractSparkContracts _ast = []  -- TODO: implement
+extractSparkContracts ast = extractFromDecls (modDecls $ adaModule ast)
+  where
+    -- | Extract contracts from a list of declarations
+    extractFromDecls :: [Declaration] -> [SparkContract]
+    extractFromDecls = concatMap extractFromDecl
+
+    -- | Extract contract from a single declaration
+    extractFromDecl :: Declaration -> [SparkContract]
+    extractFromDecl (DeclFunction _ fn) =
+        let name = unIdent (fnName fn)
+            pres = fnPreconditions fn
+            posts = fnPostconditions fn
+        in if null pres && null posts
+           then []
+           else [SparkContract
+               { scSubprogram = name
+               , scPrecondition = listToMaybe pres
+               , scPostcondition = listToMaybe posts
+               , scContractCases = []  -- Contract_Cases parsed separately via aspects
+               }]
+    -- Recurse into nested modules (packages)
+    extractFromDecl (DeclModule _ _ decls) = extractFromDecls decls
+    -- Skip other declaration types
+    extractFromDecl _ = []
 
 -- | Lexer space consumer
 sc :: Parser ()
